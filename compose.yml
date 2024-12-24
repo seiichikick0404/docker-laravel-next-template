@@ -1,0 +1,76 @@
+# Docker Compose file (version 記載なし)
+
+services:
+  # === MySQL (db) ===
+  db:
+    build:
+      context: .
+      dockerfile: infra/backend/db/Dockerfile
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: laravel_db
+      MYSQL_USER: laravel_user
+      MYSQL_PASSWORD: secret
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+    networks:
+      - backend
+
+  # === APP (Laravel) ===
+  app:
+    build:
+      context: .
+      dockerfile: infra/backend/app/Dockerfile
+      # もしマルチステージで "development" ステージを使う場合は以下のように指定可能
+      # target: development
+    container_name: app
+    volumes:
+      # ホスト側の backend ディレクトリをコンテナ側へマウント
+      - ./backend:/workspace
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  # === WEB (nginx) ===
+  web:
+    build:
+      context: .
+      dockerfile: infra/backend/web/Dockerfile
+    container_name: web
+    ports:
+      - '80:80'
+    depends_on:
+      - app
+    volumes:
+      - ./backend:/workspace
+      # 設定ファイルをホスト→コンテナにマウントする場合は適宜追加
+      # - ./infra/backend/web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - backend
+
+  # === Node (Next.js) ===
+  node:
+    build:
+      context: .
+      dockerfile: infra/frontend/node/Dockerfile
+    container_name: node
+    volumes:
+      - ./frontend:/usr/src/frontend
+    command: npm run dev
+    ports:
+      - '3000:3000'
+    networks:
+      - backend
+
+# === Named volumes ===
+volumes:
+  mysql_data:
+
+# === Network ===
+networks:
+  backend:
+    driver: bridge
