@@ -1,6 +1,6 @@
 FROM nginx:1.27
 
-WORKDIR /workspace
+WORKDIR /var/www/html
 
 ENV TZ=Asia/Tokyo
 

@@ -29,7 +29,7 @@ services:
     container_name: app
     volumes:
       # ホスト側の backend ディレクトリをコンテナ側へマウント
-      - ./backend:/workspace
+      - ./backend:/var/www/html/
     depends_on:
       - db
     networks:
