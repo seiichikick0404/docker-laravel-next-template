@@ -24,12 +24,11 @@ services:
     build:
       context: .
       dockerfile: infra/backend/app/Dockerfile
-      # もしマルチステージで "development" ステージを使う場合は以下のように指定可能
-      # target: development
     container_name: app
     volumes:
-      # ホスト側の backend ディレクトリをコンテナ側へマウント
       - ./backend:/var/www/html/
+    ports:
+      - "8000:8000"
     depends_on:
       - db
     networks:
@@ -57,8 +56,8 @@ services:
       dockerfile: infra/frontend/node/Dockerfile
     container_name: node
     volumes:
-      - ./frontend:/usr/src/frontend
-    command: npm run dev
+      - ./frontend:/node-app
+    # command: npm run dev
     ports:
       - '3000:3000'
     networks:
