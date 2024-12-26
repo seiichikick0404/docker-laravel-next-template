@@ -9,7 +9,7 @@ services:
                 GID: ${GID:-1000}
                 ENV_EXTENSION: ${ENV_EXTENSION:-dev}
         volumes:
-            - ./src/:/var/www/html
+            - ./src/backend/:/var/www/html
         user: www-data
         ports:
             - "8000:8000"
@@ -21,7 +21,7 @@ services:
             dockerfile: ./docker/next/Dockerfile
         volumes:
             - /app/node_modules
-            - ./next/:/app
+            - ./src/frontend/:/app
         # nextアプリが用意できた後
         # command: npm run dev
         depends_on:
@@ -45,7 +45,7 @@ services:
             - app
             - next
         volumes:
-            - ./src/:/var/www/html
+            - ./src/backend/:/var/www/html
 
     db:
         container_name: db
